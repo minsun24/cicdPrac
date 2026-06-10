@@ -1,0 +1,19 @@
+services:
+  localdb:
+    container_name: localdb
+    image: mariadb:10.11 # 안정적인 LTS 버전을 추천합니다.
+    ports:
+      - "3307:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: mariadb
+      MARIADB_DATABASE: localdb
+      TZ: Asia/Seoul
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --innodb_ft_min_token_size=2
+      - --log_bin_trust_function_creators=1
+      - --innodb_ft_server_stopword_table=localdb/StopWord # 기존 database 이름에 맞춰 localdb로 수정했습니다.
+
+    volumes:
+      - ./mysql:/var/lib/mysql

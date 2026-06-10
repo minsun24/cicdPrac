@@ -1,0 +1,9 @@
+# security.yml
+spring:
+  datasource:
+    url: jdbc:mariadb://localhost:3307/localdb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password: mariadb
+
+jwt:
+  secret: JeTB8C1PYXBB4/A9/jas5gVmvZBxyw/7O8Ca4eizk2Q=

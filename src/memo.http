@@ -1,0 +1,18 @@
+### login
+POST http://localhost:8080/api/users/login
+Content-Type: application/x-www-form-urlencoded
+
+username = admin@gmail.com &
+password = password123
+
+> {%
+    client.global.set("auth_token", response.body.accessToken);
+%}
+
+### memos
+GET http://localhost:8080/api/memos
+Authorization: Bearer {{auth_token}}
+
+### memo batch
+POST http://localhost:8080/api/memos/batch
+Authorization: Bearer {{auth_token}}

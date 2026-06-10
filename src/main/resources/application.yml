@@ -1,0 +1,40 @@
+# $schema: https://json.schemastore.org/spring-boot-application.json
+spring:
+  config:
+    import: classpath:security.yml
+  datasource:
+    # 1. MariaDB ?? ????? ??
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  #    # 2. ????? jdbc:mariadb:// ? ??
+  batch:
+    jdbc:
+      initialize-schema: always  # 자동 생성 (운영에선 never 권장)
+    job:
+      enabled: false  # 앱 시작 시 자동 실행 방지 (cmd에서 실행시 true로 해야 됨!)
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MariaDBDialect
+        jdbc:
+          batch_size: 50
+          time_zone: Asia/Seoul
+        order_inserts: true
+        order_updates: true
+        format_sql: true
+        use_sql_comments: true
+  
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger.html
+    url: /pipeline/api-docs
+  api-docs:
+    enabled: true
+    path: /pipeline/api-docs

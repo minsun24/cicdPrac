@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Chat | WebSocket</title>
+    <style>
+        .red {
+            color: red;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="">
+<div class="container flex flex-col border mx-auto h-screen">
+    <h1 class="text-2xl text-center">HTML Chat</h1>
+    <section class="flex-1 p-3 flex flex-col">
+        <div class="border border-b-0 flex justify-center items-center gap-3">
+            <label for="nickname">
+                nickname:
+                <input class="px-2 border rounded-md" id="nickname" type="text" value="Kim">
+            </label>
+            <button class="border rounded-md bg-green-500 text-white px-2 disabled:bg-gray-300" id="btnConnect"
+                    onclick="connect()">connect
+            </button>
+        </div>
+        <div class="border flex-1" id="msgsDiv"></div>
+        <div class="border border-t-0 flex gap-1">
+            <input class="px-2 w-full" id="msgInp" id="msgInp" type="text" value="YYY">
+            <button class="border rounded-md bg-green-500 text-white px-2" onclick="send()">send</button>
+        </div>
+    </section>
+    <footer class="">Footer</footer>
+</div>
+
+<script>
+    let isConnected = false;
+    let stompClient = null;
+
+    const emit = (msg) => {
+        const msgStr = JSON.stringify(msg);
+        const endpoint = msg.type === 'CHAT'
+            ? '/app/broadcast' : '/app/join-leave';
+        stompClient.send(endpoint, {}, msgStr);
+    };
+
+    const send = (msg) => {
+        emit({
+            from: nickname.value,
+            text: msg || msgInp.value,
+            type: 'CHAT'
+        });
+    }
+
+    const setMessages = (msg) => {
+        const p = document.createElement('p');
+        p.innerHTML = msg.from + ": " + msg.text;
+        msgsDiv.appendChild(p);
+    };
+
+    const connect = options => {
+        if (isConnected) return alert('Already Connected!');
+        const username = nickname.value;
+        if (!username?.trim()) return;
+
+        const socket = new SockJS('http://localhost:8080/broadcast');
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, (frame) => {
+                console.log('onConnect!', username);
+                send(`Hi~ I'm connected now!`);
+
+                stompClient.subscribe('/topic/broadcast', message => {
+                    setMessages(JSON.parse(message.body));
+                });
+
+                // join/leave 구독
+                stompClient.subscribe('/topic/join-leave', function (message) {
+                    setMessages(JSON.parse(message.body));
+                });
+            },
+            (error) => {
+                console.log('STOMP error: ' + error);
+                if (error?.includes('Lost connection')) {
+                    console.error('disconnected!');
+                    setMessages({from: 'system', text: 'disconnected!'});
+                }
+            }
+        );
+
+        isConnected = true;
+        const btnConnect = document.getElementById('btnConnect');
+        btnConnect.disabled = true;
+    };
+</script>
+</body>
+
+</html>

@@ -1,0 +1,7 @@
+@baseUrl=http://localhost:8080/batch/run
+
+### prodJob
+POST {{baseUrl}}/prodJob
+
+### chunkJob
+POST {{baseUrl}}/chunkJob

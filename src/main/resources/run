@@ -1,0 +1,2 @@
+# 실행(Windows - cmd)
+gradlew bootRun --args='--spring.batch.job.name=prodJob'
